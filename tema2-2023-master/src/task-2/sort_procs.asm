@@ -27,93 +27,81 @@ sort_procs:
     ;; DO NOT MODIFY
 
     ;; Your code starts here
-    mov dword [length], eax 
+    imul eax, 5
+    mov dword [length], eax
+    mov edi, [ebp + 8]
 
     ; aplicam selection sort
-    ; ecx -> i, ebx -> j
+    ; ecx -> i, edx -> j
+    ;PRINTF32 `length = %d\n\0`, dword [length]
     xor edx, edx
     xor eax, eax
     xor ecx, ecx
-
 first_for:
     cmp ecx, dword [length]
     jge end
 
-    ;offsetul pt i
-    push ecx
-    imul ecx, proc_size
-    mov [ilen], ecx
-    pop ecx
+    xor edx, edx
+    mov edx, ecx
 
-    xor ebx, ebx
-    mov ebx, ecx
 second_for:
     ; j = i + 1
-    inc ebx
+    add edx, proc_size
 
-    cmp ebx, dword [length]
+    cmp edx, dword [length]
     jge second_for_end
-    
-    ;offsetul pt j
-    push ebx
-    imul ebx, proc_size
-    mov [jlen], ebx
-
-    mov edi, dword [ilen]
-    mov edx, dword [jlen]
-
+    ; PRINTF32 `I =i %d, j = %d\n\0`, ecx, edx
 prio:
-    mov al, byte [ebp + 8 + edi + proc.prio]
-    mov bl, byte [ebp + 8 + edx + proc.prio]
+    mov al, [edi + ecx + proc.prio]
+    mov bl, [edi + edx + proc.prio]
 
     cmp al, bl
     je time
+    jl final
     jg swap
-    jl finalise
 
 time:
-    mov ax, [ebp + 8 + edi + proc.time]
-    mov bx, [ebp + 8 + edx + proc.time]
+    mov ax, [edi + ecx + proc.time]
+    mov bx, [edi + edx + proc.time]
 
     cmp ax, bx
-    je id
+    je pid
+    jl final
     jg swap
-    jl finalise
 
-id: 
-    mov ax, [ebp + 8 + edi + proc.pid]
-    mov bx, [ebp + 8 + edx + proc.pid]
+pid:
+    mov ax, [edi + ecx + proc.pid]
+    mov bx, [edi + edx + proc.pid]
+
     cmp ax, bx
+    jle final
     jg swap
-    jle finalise
 
 swap:
-    mov al, [ebp + 8 + edi + proc.prio]
-    mov bl, [ebp + 8 + edx + proc.prio]
-    mov [ebp + 8 + edi + proc.prio], bl
-    mov [ebp + 8 + edx + proc.prio], al
+    mov al, [edi + ecx + proc.prio]
+    mov bl, [edi + edx + proc.prio]
+    mov [edi + ecx + proc.prio], bl
+    mov [edi + edx + proc.prio], al
 
-    mov ax, [ebp + 8 + edi + proc.time]
-    mov bx, [ebp + 8 + edx + proc.time]
-    mov [ebp + 8 + edi + proc.time], bx
-    mov [ebp + 8 + edx + proc.time], ax
+    mov ax, [edi + ecx + proc.pid]
+    mov bx, [edi + edx + proc.pid]
+    mov [edi + ecx + proc.pid], bx
+    mov [edi + edx + proc.pid], ax
 
-    mov ax, [ebp + 8 + edi + proc.pid]
-    mov bx, [ebp + 8 + edx + proc.pid]
-    mov [ebp + 8 + edi + proc.pid], bx
-    mov [ebp + 8 + edx + proc.pid], ax
+    mov ax, [edi + ecx + proc.time]
+    mov bx, [edi + edx + proc.time]
+    mov [edi + ecx + proc.time], bx
+    mov [edi + edx + proc.time], ax
 
-finalise:
-    ; revenim la val initala j
-    pop ebx
+
+final:
     jmp second_for
 second_for_end:
-    inc ecx
+    add ecx, proc_size
     jmp first_for
 
 end:
-
-
+    ;PRINTF32 `ecx = %d\n\0`, ecx
     ;; Your code ends here
     
 
