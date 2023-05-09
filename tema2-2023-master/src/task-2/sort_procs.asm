@@ -27,13 +27,15 @@ sort_procs:
     ;; DO NOT MODIFY
 
     ;; Your code starts here
+
+    ; vom incrementa la fiecare pas cu 5
+    ; prin urmare vom inmulti length cu 5
     imul eax, 5
     mov dword [length], eax
     mov edi, [ebp + 8]
 
     ; aplicam selection sort
     ; ecx -> i, edx -> j
-    ;PRINTF32 `length = %d\n\0`, dword [length]
     xor edx, edx
     xor eax, eax
     xor ecx, ecx
@@ -41,16 +43,18 @@ first_for:
     cmp ecx, dword [length]
     jge end
 
+    ; j = i
     xor edx, edx
     mov edx, ecx
 
 second_for:
-    ; j = i + 1
+    ; j = i + 5 (urm structura)
     add edx, proc_size
 
     cmp edx, dword [length]
     jge second_for_end
-    ; PRINTF32 `I =i %d, j = %d\n\0`, ecx, edx
+    
+    ; comparam prioritatile
 prio:
     mov al, [edi + ecx + proc.prio]
     mov bl, [edi + edx + proc.prio]
@@ -60,6 +64,7 @@ prio:
     jl final
     jg swap
 
+    ; comparam timpul
 time:
     mov ax, [edi + ecx + proc.time]
     mov bx, [edi + edx + proc.time]
@@ -69,6 +74,7 @@ time:
     jl final
     jg swap
 
+    ; comparam pid
 pid:
     mov ax, [edi + ecx + proc.pid]
     mov bx, [edi + edx + proc.pid]
@@ -77,6 +83,7 @@ pid:
     jle final
     jg swap
 
+    ; proc_size > 4, prin urmare facem swap field cu field
 swap:
     mov al, [edi + ecx + proc.prio]
     mov bl, [edi + edx + proc.prio]
@@ -96,6 +103,7 @@ swap:
 
 final:
     jmp second_for
+
 second_for_end:
     add ecx, proc_size
     jmp first_for
