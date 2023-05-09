@@ -52,14 +52,17 @@ clean_results:
     imul ebx, proc_size
     mov [length], ebx
 
-    ; pentru consecventa, am folosit edi ca inceputul vectorului de procese
+    ; pentru consecventa, am folosit edi pt inceputul vectorului de procese
     mov edi, [ebp + 8]
     mov esi, [ebp + 16]
-    xor ecx, ecx
 
+    ; ecx este indexul
+    xor ecx, ecx
 for:
     cmp ecx, dword [length]
     jge end_for
+
+    ; mutam in al prioritatea si in bx timpul
     xor eax, eax
     xor ebx, ebx
     mov al, [edi + ecx + proc.prio]
@@ -67,8 +70,8 @@ for:
 
     cmp ecx, 0
     jg case1
-    ;PRINTF32 `prio = %d, time = %d\n\0`, eax, ebx
 
+    ; folosim un 'switch'
 case1:
     cmp byte al, 1
     jg case2
@@ -103,29 +106,31 @@ case5:
     jmp final
 
 final:
+    ; incrementam indexul
     add ecx, proc_size
     jmp for
+
 end_for:
 
     xor ebx, ebx
-    ;contorul
+    ; contorul
 loop:
     cmp ebx, 5
     jge end
 
+    ; initializam registrii folositi in impartire cu 0
     xor eax, eax
     xor ecx, ecx
     xor edx, edx
 
     mov eax, [time_result + ebx * 4]
     mov ecx, [prio_result + ebx * 4]
-    PRINTF32 `prio = %d -> %d divided by %d \n\0`,ebx, eax, ecx
-    xor edx, edx
     ; testam impartirea la 0
     cmp ecx, 0
     je zero
     div ecx
 
+    ; impartirea a fost cu succes
     mov [esi + ebx  * avg_size + avg.quo], eax
     mov [esi + ebx  * avg_size + avg.remain], dx
     jmp zero_done
@@ -133,10 +138,11 @@ loop:
 zero:
     mov [esi + ebx  * avg_size + avg.quo], eax
     mov [esi + ebx  * avg_size + avg.remain], dx
-zero_done:
 
+zero_done:
     inc ebx
     jmp loop
+
 end:
 
     PRINTF32 `end\n\0`
