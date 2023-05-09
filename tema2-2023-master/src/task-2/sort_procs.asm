@@ -1,5 +1,6 @@
 %include "../include/io.mac"
 
+
 struc proc
     .pid: resw 1
     .prio: resb 1
@@ -8,12 +9,13 @@ endstruc
 
 section .text
     global sort_procs
-
+    extern printf
 section .data
     length dd 0
     aux dd 0
     ilen dd 0
     jlen dd 0
+    procs dd 0
 
 sort_procs:
     ;; DO NOT MODIFY
@@ -25,106 +27,91 @@ sort_procs:
     ;; DO NOT MODIFY
 
     ;; Your code starts here
-    mov dword [length], eax
-    xor eax, eax
+    mov dword [length], eax 
 
     ; aplicam selection sort
     ; ecx -> i, ebx -> j
+    xor edx, edx
+    xor eax, eax
     xor ecx, ecx
+
 first_for:
-    cmp ecx, [length]
-    jge first_for_end
+    cmp ecx, dword [length]
+    jge end
 
-    ; initializam contorul 2
-
-    ; calculam offset ul pt i
+    ;offsetul pt i
     push ecx
     imul ecx, proc_size
-    mov dword [ilen], ecx
+    mov [ilen], ecx
     pop ecx
 
-second_for:
     xor ebx, ebx
     mov ebx, ecx
+second_for:
     ; j = i + 1
     inc ebx
-    cmp ebx, [length]
-    jge second_for_end
 
-    ; calculez offset petru j
+    cmp ebx, dword [length]
+    jge second_for_end
+    
+    ;offsetul pt j
     push ebx
     imul ebx, proc_size
-    mov dword [jlen], ebx
-    pop ebx
+    mov [jlen], ebx
 
-    xor edi, edi
-    xor eax, eax
     mov edi, dword [ilen]
-    mov al, [edx + edi + proc.prio]
-    mov edi, dword [jlen]
-    mov ah, [edx + edi + proc.prio]
+    mov edx, dword [jlen]
 
-check_prio:
-    cmp al, ah
-    jl second_for_inc
+prio:
+    mov al, byte [ebp + 8 + edi + proc.prio]
+    mov bl, byte [ebp + 8 + edx + proc.prio]
+
+    cmp al, bl
+    je time
     jg swap
-    je check_time
+    jl finalise
 
-
-check_time:
-    ;am rams fara registri, deci va trebuie sa folosesc ebx
-    push ebx
-    xor eax, eax
-    xor ebx, ebx
-    xor edi, edi
-
-    mov edi, dword [ilen]
-    mov ax, [edx + edi + proc.time]
-
-    xor edi, edi
-    mov edi, dword [jlen]
-    mov bx, [edx + edi + proc.time]
+time:
+    mov ax, [ebp + 8 + edi + proc.time]
+    mov bx, [ebp + 8 + edx + proc.time]
 
     cmp ax, bx
-    jl second_for_inc
-    je check_id
+    je id
     jg swap
+    jl finalise
 
-check_id:
-    xor eax, eax
-    xor ebx, ebx
-    xor edi, edi
-
-    mov edi, dword [ilen]
-    mov ax, [edx + edi + proc.pid]
-
-    xor edi, edi
-    mov edi, dword [jlen]
-    mov bx, [edx + edi + proc.pid]
-
+id: 
+    mov ax, [ebp + 8 + edi + proc.pid]
+    mov bx, [ebp + 8 + edx + proc.pid]
     cmp ax, bx
-    jle second_for_inc
     jg swap
+    jle finalise
 
 swap:
-    ; structura depaseste 4 octetim deci va trebuie sa o mutam buc cu buc
-    xor eax, eax
-    xor ebx, ebx
-    xor edi, edi
+    mov al, [ebp + 8 + edi + proc.prio]
+    mov bl, [ebp + 8 + edx + proc.prio]
+    mov [ebp + 8 + edi + proc.prio], bl
+    mov [ebp + 8 + edx + proc.prio], al
 
-    mov edi, dword [ilen]
-    mov al, 
+    mov ax, [ebp + 8 + edi + proc.time]
+    mov bx, [ebp + 8 + edx + proc.time]
+    mov [ebp + 8 + edi + proc.time], bx
+    mov [ebp + 8 + edx + proc.time], ax
 
-second_for_inc:
-    ;incrementan j
+    mov ax, [ebp + 8 + edi + proc.pid]
+    mov bx, [ebp + 8 + edx + proc.pid]
+    mov [ebp + 8 + edi + proc.pid], bx
+    mov [ebp + 8 + edx + proc.pid], ax
+
+finalise:
+    ; revenim la val initala j
     pop ebx
-    inc ebx
-
+    jmp second_for
 second_for_end:
-    ;incrementan i
     inc ecx
+    jmp first_for
 
-first_for_end:
+end:
 
 
     ;; Your code ends here

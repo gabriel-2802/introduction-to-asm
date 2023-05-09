@@ -1,10 +1,14 @@
 %include "../include/io.mac"
-
+%define COUNT 26
 ;; defining constants, you can use these as immediate values in your code
 LETTERS_COUNT EQU 26
 
 section .data
     extern len_plain
+    x dd 0
+    rotor dd 0
+    direct dd 0
+    letters time
 
 section .text
     global rotate_x_positions
@@ -25,6 +29,48 @@ rotate_x_positions:
     ;; DO NOT MODIFY
     ;; TODO: Implement rotate_x_positions
     ;; FREESTYLE STARTS HERE
+   
+    mov [x], eax
+    mov [rotor], ebx
+    mov [direct], edx
+
+    xor eax, eax
+    xor ebx, ebx
+    xor edx, edx
+
+    cmp dword [direct], 0
+    je right ; if forward is 0, rotate right
+
+left:
+    mov eax, [rotor]
+    imul eax, eax, LETTERS_COUNT
+    mov edi, ecx
+    add edi, eax ; edi now points to the beginning of the rotor row
+
+for_left:
+    cmp ebx, LETTERS_COUNT
+    jge endfor
+
+    mov dl, byte [edi + ebx]
+    sub dl, byte [x]
+    cmp dl, 'A'
+    jge done_left
+    add dl, LETTERS_COUNT
+
+done_left:
+    mov byte [edi + ebx], dl
+    inc ebx
+    jmp for_left
+
+endfor:
+    jmp end
+
+right:
+
+    jmp end
+
+end:
+
 
 
     ;; FREESTYLE ENDS HERE
