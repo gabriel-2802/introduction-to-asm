@@ -12,10 +12,6 @@ section .text
     extern printf
 section .data
     length dd 0
-    aux dd 0
-    ilen dd 0
-    jlen dd 0
-    procs dd 0
 
 sort_procs:
     ;; DO NOT MODIFY
