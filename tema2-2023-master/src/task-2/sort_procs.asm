@@ -109,7 +109,6 @@ second_for_end:
     jmp first_for
 
 end:
-    ;PRINTF32 `ecx = %d\n\0`, ecx
     ;; Your code ends here
     
 
