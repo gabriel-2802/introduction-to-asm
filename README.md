@@ -1,9 +1,3 @@
-# Perfect assignment
+# INTRODUCTION TO ASM - copyright Carauleanu Valentin Gabriel 311CA
 
-Write a program that given a number as input argument prints the corespondig number of 1s on standard output.
-
-E.g:
-```bash
-$> ./binary 3
-1 1 1
-```
+My second homework for programming II and my firt ever Assembly experience.
